@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Making your first Phaser 3 Game - Part 1</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.1.1/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+   var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+		physics: {
+			default: 'arcade',
+			arcade: {
+				gravity: { y: 300 },
+				debug: false
+			}
+		},
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+        this.load.image('sky', 'sky.png');
+        this.load.image('ground', 'ground.png');
+        this.load.image('dieRed2', 'dieRed2.png');
+        console.log('create')
+
+    }
+
+    //var platforms;
+    var sky;
+
+    function create ()
+    {
+        sky = this.add.image(0, 0, 'sky');
+        sky.displayWidth = game.config.width * 2;
+        sky.displayHeight = game.config.height * 2;
+        console.log(sky)
+        platforms = this.physics.add.staticGroup();
+        platforms.create(400, 550, 'ground');
+        platforms.create(300, 200, 'dieRed2');
+        console.log('update')
+
+    }
+    function update ()
+    {
+        //console.log('foo');
+    }
+
+
+    console.log('foo');
+</script>
+
+</body>
+</html>
