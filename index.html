@@ -39,6 +39,8 @@
         this.load.image('ground', 'ground.png');
         this.load.image('dieRed2', 'dieRed2.png');
         console.log('create')
+        this.load.audio('boden', ['bodenstaendig_2000_in_rock_4bit.mp3','bodenstaendig_2000_in_rock_4bit.ogg']);
+        this.load.audio('diceroll', '220744__dermotte__dice-06.wav');
 
     }
 
@@ -54,7 +56,11 @@
         platforms = this.physics.add.staticGroup();
         platforms.create(400, 550, 'ground');
         platforms.create(300, 200, 'dieRed2');
-        console.log('update')
+        console.log('update');
+        var music = this.sound.add('boden');
+        music.play();
+        var diceroll = this.sound.add('diceroll');
+        diceroll.play();
 
     }
     function update ()
