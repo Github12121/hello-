@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Making your first Phaser 3 Game - Part 1</title>
-    <script src="//cdn.jsdelivr.net/npm/phaser@3.1.1/dist/phaser.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.14/dist/phaser.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -50,40 +50,63 @@
 
     //var platforms;
     var sky;
+    var timer;
+    var remainingSeconds = 60;
+    var timerText;
+    var tween;
 
     function create ()
     {
+        timer = this.time.addEvent({
+            delay: 1000,
+            repeat: 59,
+            callback: countDown
+        });
+
         sky = this.add.image(0, 0, 'sky');
         sky.displayWidth = game.config.width * 2;
         sky.displayHeight = game.config.height * 2;
         console.log(sky)
         platforms = this.physics.add.staticGroup();
         platforms.create(400, 550, 'ground');
-        die = this.add.sprite(100, 200, 'dieRed2');
+
+        die = this.physics.add.sprite(100, 200, 'dieRed2');
+        die.setBounce(1, 1);
+        die.body.setAllowGravity(false);
+
         console.log('update');
         var music = this.sound.add('backgroundMusic');
+
         music.play();
         //var diceroll = this.sound.add('diceroll');
         //diceroll.play();
         spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.tweens.add({
+
+        timerText = this.add.text(20, 20, '60', {fontSize: 50, fontFamily: 'Arial'});
+
+        tween = this.tweens.add({
             targets: die,
-            x: 1000,
-            duration: 3000,
-            ease: 'Power2',
+            x: 700,
+            duration: 1000,
+            //ease: 'Power2',
             yoyo: true,
-            repeat: 2
+            repeat: -1
         });
     }
     function update ()
     {
         if (Phaser.Input.Keyboard.JustDown(spacebar))
         {
-            alert('Space key pressed');
+            tween.stop();
+            die.body.setAllowGravity(true);
         }
         //console.log('foo');
     }
-
+    function countDown ()
+    {
+        remainingSeconds = remainingSeconds - 1;
+        timerText.setText(remainingSeconds);
+    }
 
     console.log('foo');
 </script>
