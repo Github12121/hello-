@@ -38,28 +38,28 @@
         this.load.image('sky', 'sky.png');
         this.load.image('ground', 'ground.png');
         this.load.image('dieRed2', 'dieRed2.png');
-        console.log('create')
 
         var songs = ['bodenstaendig_2000_in_rock_4bit.mp3','CatAstroPhi_shmup_normal.wav'];
         var song = songs[Math.floor(Math.random() * 2)];
         this.load.audio('backgroundMusic', song );
         this.load.audio('diceroll', '220744__dermotte__dice-06.wav');
-
     }
 
     //var platforms;
     var diceroll;
     var sky;
     var timer;
-    var remainingSeconds = 60;
+    var remainingSeconds = 10;
     var timerText;
     var tween;
 
     function create ()
     {
+        globalGameReference = this;
+
         timer = this.time.addEvent({
             delay: 1000,
-            repeat: 59,
+            repeat: 9,
             callback: countDown
         });
 
@@ -78,7 +78,7 @@
 
         this.physics.add.collider(die, platforms);
         console.log('update');
-        var music = this.sound.add('backgroundMusic');
+        music = this.sound.add('backgroundMusic');
 
         music.play();
         diceroll = this.sound.add('diceroll');
@@ -109,7 +109,7 @@
             die.body.setAllowGravity(false);
 
             this.physics.add.collider(die, platforms);
-            this.physics.add.collider(die, die);
+            this.physics.add.collider(die, dice);
 
             tween = this.tweens.add({
                 targets: die,
@@ -131,6 +131,23 @@
     {
         remainingSeconds = remainingSeconds - 1;
         timerText.setText(remainingSeconds);
+        if (remainingSeconds <= 0){
+            music.stop();
+            dice.children.iterate(removeDie);
+        }
+    }
+
+    function removeDie(child)
+    {
+        console.log(child);
+        child.visible = false;
+        var points = 1;
+        if (child.y < 150) {
+            points = 2;
+        } else if (child.y < 120) {
+            points = 3;
+        }
+        globalGameReference.add.text(child.x, child.y, '1', {fontSize: 30, fontFamily: 'Arial'});
     }
 
     console.log('foo');
