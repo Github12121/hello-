@@ -15,8 +15,8 @@
 <script type="text/javascript">
     var config = {
         type: Phaser.AUTO,
-        width: 800,
-        height: 600,
+        width: 640,
+        height: 960,
         physics: {
             default: 'arcade',
             arcade: {
@@ -46,12 +46,14 @@
     }
 
     //var platforms;
+    var die;
     var diceroll;
     var sky;
     var timer;
-    var remainingSeconds = 10;
+    var remainingSeconds = 60;
     var timerText;
     var tween;
+    var ready = true;
 
     function create ()
     {
@@ -59,19 +61,19 @@
 
         timer = this.time.addEvent({
             delay: 1000,
-            repeat: 9,
+            repeat: 59,
             callback: countDown
         });
 
         sky = this.add.image(0, 0, 'sky');
         sky.displayWidth = game.config.width * 2;
         sky.displayHeight = game.config.height * 2;
-        console.log(sky)
+        console.log(sky);
         platforms = this.physics.add.staticGroup();
-        platforms.create(400, 550, 'ground');
+        platforms.create(320, 900, 'ground');
 
         dice = this.physics.add.group();
-        die = dice.create(100,200, 'dieRed2');
+        die = dice.create(100,150, 'dieRed2');
 
         die.setBounce(0.2);
         die.body.setAllowGravity(false);
@@ -89,38 +91,49 @@
 
         tween = this.tweens.add({
             targets: die,
-            x: 700,
+            x: 500,
             duration: 1000,
-            ease: 'Sine.easeOut',
+            ease: 'Sine.easeInOut',
             yoyo: true,
             repeat: -1
         });
     }
 
+    function createDie() {
+        die = dice.create(100,150, 'dieRed2');
+        die.setBounce(0.5);
+        die.body.setAllowGravity(false);
+
+        globalGameReference.physics.add.collider(die, platforms);
+        globalGameReference.physics.add.collider(die, dice);
+
+        tween = globalGameReference.tweens.add({
+            targets: die,
+            x: 500,
+            duration: 1000,
+            ease: 'Sine.easeInOut',
+            yoyo: true,
+            repeat: -1
+        });
+        ready = true;
+    }
+
+    // Game loop!
     function update ()
     {
-        if (Phaser.Input.Keyboard.JustDown(spacebar))
+        if (timer < 1) {
+            return;
+        }
+        if (Phaser.Input.Keyboard.JustDown(spacebar)&& ready == true)
         {
             tween.stop();
             die.body.setAllowGravity(true);
 
-            die = dice.create(100,200, 'dieRed2');
-            die.setBounce(0.5);
-            die.body.setAllowGravity(false);
+            ready = false;
 
-            this.physics.add.collider(die, platforms);
-            this.physics.add.collider(die, dice);
-
-            tween = this.tweens.add({
-                targets: die,
-                x: 700,
-                duration: 1000,
-                ease: 'Sine.easeOut',
-                yoyo: true,
-                repeat: -1
-            });
+            setTimeout(createDie, 2000);
         }
-        if (null != die && die.y > 600) {
+        if (null != die && die.y > 1000) {
             die.destroy();
             die = null;
             diceroll.play();
@@ -139,18 +152,20 @@
 
     function removeDie(child)
     {
-        console.log(child);
+        console.log(child.y);
         child.visible = false;
         var points = 1;
-        if (child.y < 150) {
-            points = 2;
-        } else if (child.y < 120) {
+        if (child.y < 672) {
             points = 3;
+        } else if (child.y < 736) {
+            points = 2;
+        } else {
+            points = 1;
         }
         globalGameReference.add.text(child.x, child.y, '1', {fontSize: 30, fontFamily: 'Arial'});
     }
 
-    console.log('foo');
+    ///console.log('foo');
 </script>
 
 </body>
