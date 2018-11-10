@@ -18,11 +18,8 @@
         width: 640,
         height: 960,
         physics: {
-            default: 'arcade',
-            arcade: {
-                gravity: { y: 300 },
-                debug: false
-            }
+            default: 'matter'
+
         },
         scene: {
             preload: preload,
@@ -47,6 +44,7 @@
 
     //var platforms;
     var die;
+    var dice = [];
     var diceroll;
     var sky;
     var timer;
@@ -69,17 +67,14 @@
         sky.displayWidth = game.config.width * 2;
         sky.displayHeight = game.config.height * 2;
         console.log(sky);
-        platforms = this.physics.add.staticGroup();
-        platforms.create(320, 900, 'ground');
 
-        dice = this.physics.add.group();
-        die = dice.create(100,150, 'dieRed2');
+        this.matter.add.image(320,900, 'ground', null, {isStatic: true});
 
-        die.setBounce(0.2);
-        die.body.setAllowGravity(false);
 
-        this.physics.add.collider(die, platforms);
-        console.log('update');
+        die = this.matter.add.sprite(100,150, 'dieRed2').setBounce(0.2);
+        die.setIgnoreGravity(true);
+
+
         music = this.sound.add('backgroundMusic');
 
         music.play();
@@ -100,12 +95,7 @@
     }
 
     function createDie() {
-        die = dice.create(100,150, 'dieRed2');
-        die.setBounce(0.5);
-        die.body.setAllowGravity(false);
-
-        globalGameReference.physics.add.collider(die, platforms);
-        globalGameReference.physics.add.collider(die, dice);
+        die = globalGameReference.matter.add.sprite(100,150, 'dieRed2').setBounce(0.2).setIgnoreGravity(true);
 
         tween = globalGameReference.tweens.add({
             targets: die,
@@ -127,26 +117,33 @@
         if (Phaser.Input.Keyboard.JustDown(spacebar)&& ready == true)
         {
             tween.stop();
-            die.body.setAllowGravity(true);
-
+            die.setIgnoreGravity(false);
+            dice.push(die);
             ready = false;
 
             setTimeout(createDie, 2000);
         }
-        if (null != die && die.y > 1000) {
-            die.destroy();
-            die = null;
-            diceroll.play();
+
+
+        for (item of dice){
+            if (item.active && item.y > 1000) {
+                item.destroy();
+                item = null;
+                diceroll.play();
+            }
+
         }
-        //console.log('foo');
     }
+
     function countDown ()
     {
         remainingSeconds = remainingSeconds - 1;
         timerText.setText(remainingSeconds);
         if (remainingSeconds <= 0){
             music.stop();
-            dice.children.iterate(removeDie);
+            for (die of dice) {
+                removeDie(die);
+            }
         }
     }
 
@@ -156,13 +153,15 @@
         child.visible = false;
         var points = 1;
         if (child.y < 672) {
-            points = 3;
+            points = 4;
         } else if (child.y < 736) {
+            points = 3;
+        } else if (child.y < 800) {
             points = 2;
         } else {
             points = 1;
         }
-        globalGameReference.add.text(child.x, child.y, '1', {fontSize: 30, fontFamily: 'Arial'});
+        globalGameReference.add.text(child.x, child.y, points , {fontSize: 30, fontFamily: 'Arial'});
     }
 
     ///console.log('foo');
