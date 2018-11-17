@@ -48,10 +48,11 @@
     var diceroll;
     var sky;
     var timer;
-    var remainingSeconds = 60;
+    var remainingSeconds = 20;
     var timerText;
     var tween;
     var ready = true;
+    var totalPoints = 0;
 
     function create ()
     {
@@ -59,7 +60,7 @@
 
         timer = this.time.addEvent({
             delay: 1000,
-            repeat: 59,
+            repeat: 19,
             callback: countDown
         });
 
@@ -91,6 +92,11 @@
             ease: 'Sine.easeInOut',
             yoyo: true,
             repeat: -1
+        });
+
+        this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+            console.log('collision', bodyA, bodyB);
+            diceroll.play();
         });
     }
 
@@ -128,7 +134,7 @@
         for (item of dice){
             if (item.active && item.y > 1000) {
                 item.destroy();
-                item = null;
+                //item = null;
                 diceroll.play();
             }
 
@@ -141,15 +147,19 @@
         timerText.setText(remainingSeconds);
         if (remainingSeconds <= 0){
             music.stop();
-            for (die of dice) {
-                removeDie(die);
+            console.log(dice);
+            for (item of dice) {
+                if (item.active) {
+                    countDie(item);
+                }
             }
+            globalGameReference.add.text(70,20,'You got a score of '+ totalPoints, {fontSize: 30, fontFamily: 'Arial'});
         }
     }
 
-    function removeDie(child)
+
+    function countDie(child)
     {
-        console.log(child.y);
         child.visible = false;
         var points = 1;
         if (child.y < 672) {
@@ -161,6 +171,7 @@
         } else {
             points = 1;
         }
+        totalPoints += points;
         globalGameReference.add.text(child.x, child.y, points , {fontSize: 30, fontFamily: 'Arial'});
     }
 
